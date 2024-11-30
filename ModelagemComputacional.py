@@ -3,56 +3,52 @@ import sys
 
 # Verifica se o numpy já está instalado, caso contrário, instala
 try:
-    # Numpy já está instalado e importado como np.
     import numpy as np
 
-    a = 2
-    b = 0
-    c = -1
-    d = 1
-
-    # Definição da matriz
-    matriz = np.array([
-        [a, b, b, b],
-        [a, a, b, b],
-        [d, c, a, c],
-        [b, d, c, a]
-    ])
+    # Matriz Original
+    A = np.array([[2, 0, 0, 0], [2, 2, 0, 0], [1, -1, 2, -1], [0, 1, -1, 2]])
 
     # Cálculo dos autovalores e autovetores
-    autovalores, autovetores = np.linalg.eig(matriz)
+    autovalores, autovetores = np.linalg.eig(A)
 
-    # Ordenação dos autovalores e autovetores
-    indices_ordenados = np.argsort(autovalores)
-    autovalores_ordenados = autovalores[indices_ordenados]
-    autovetores_ordenados = autovetores[:, indices_ordenados]
+    # Formando a matriz diagonal (D)
+    D = np.diag(autovalores)
 
-    autovetores_ajustados = []
-    for i in range(autovetores_ordenados.shape[1]):
-        autovetor = autovetores_ordenados[:, i]
-        # Normalizar pelo maior valor absoluto
-        autovetor /= np.max(np.abs(autovetor))
-        # Arredondar para 1 casa decimal para correspondência exata
-        autovetores_ajustados.append(np.around(autovetor, decimals=1))
+    # Matriz inversa dos autovetores (P^-1)
+    P_inv = np.linalg.inv(autovetores)
 
-    print("Matriz Utilizada: ")
-    print("[2, 0, 0, 0],\n")
-    print("[2, 2, 0, 0],\n")
-    print("[1, -1, 2, -1],\n")
-    print("[0, 1, -1, 2]\n")
+    # Verificando a diagonalização: A = P @ D @ P^-1
+    A_reconstruida = autovetores @ D @ P_inv
 
-    # Exibição dos autovalores e autovetores ajustados
-    print("Autovalores ordenados:")
-    print(autovalores_ordenados)
+    print("Integrantes: Leonardo Duarte Veiga Ferreira, Rafael Gomes Parente e Yann Soares Guimarães")
+    print("Tema do problema: Construção de um algoritmo para resolver problemas de autovalor e autovetor de uma matriz, e realizar a diagonalização completa da matriz.")
+    print("RESULTADOS:\n")
 
-    print("\nAutovetores correspondentes:")
-    for i, autovetor in enumerate(autovetores_ajustados):
-        print(f"Autovetor correspondente ao autovalor λ = {autovalores_ordenados[i]}:")
-        print(autovetor)
+    # Exibindo os resultados
+    print("Matriz Original:")
+    print(A)
 
-    print("\nNão é possível obter a diagonização da Matriz escolhida...")
+    print("\nAutovalores:")
+    print(autovalores)
 
-# Caso o Numpy não esteja instalado, o trecho abaixo irá instalar.
+    print("\nAutovetores (P):")
+    print(autovetores)
+
+    print("\nMatriz Diagonal (D):")
+    print(D)
+
+    print("\nMatriz Inversa dos Autovetores (P^-1):")
+    print(P_inv)
+
+    print("\nReconstrução da Matriz (P @ D @ P^-1):")
+    print(np.round(A_reconstruida, decimals=2))  # Arredondamento para evitar imprecisões numéricas
+
+    # Verificando se a diagonalização foi realizada corretamente
+    if np.allclose(A, A_reconstruida):
+        print("\nA matriz foi diagonalizada corretamente!")
+    else:
+        print("\nErro na diagonalização. A reconstrução não corresponde à matriz original, logo a matriz não é diagonalizável...")
+        
 except ImportError:
     print("Numpy não encontrado. Instalando...")
     subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy"])
